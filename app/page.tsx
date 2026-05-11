@@ -1,8 +1,20 @@
-"use client";
-
+import fs from "fs";
+import path from "path";
 import Image from "next/image";
 import { FadeIn } from "@/components/FadeIn";
 import { StaggerContainer, StaggerItem } from "@/components/FadeInStagger";
+import { ProjectCarousel } from "@/components/ProjectCarousel";
+
+const IMAGE_EXTS = new Set([".jpg", ".jpeg", ".png", ".webp", ".avif"]);
+
+function getProjectPhotos(folder: string): string[] {
+  const dir = path.join(process.cwd(), "public", "fotos", "3-proyectos", folder);
+  return fs
+    .readdirSync(dir)
+    .filter((f) => IMAGE_EXTS.has(path.extname(f).toLowerCase()))
+    .sort()
+    .map((f) => `/fotos/3-proyectos/${folder}/${f}`);
+}
 
 const steps = [
   {
@@ -31,37 +43,11 @@ const steps = [
   },
 ];
 
-const projects = [
-  {
-    eyebrow: "COCINA · ESQUEMA L",
-    title: "Residencia Cumbres",
-    detail: "Mérida, 2024",
-  },
-  {
-    eyebrow: "CLÓSET MASTER",
-    title: "Casa Aldea",
-    detail: "Yucatán, 2024",
-  },
-  {
-    eyebrow: "COCINA CON ISLA",
-    title: "Departamento Altabrisa",
-    detail: "Mérida, 2023",
-  },
-  {
-    eyebrow: "BAÑO PRINCIPAL",
-    title: "Residencia Conkal",
-    detail: "Yucatán, 2024",
-  },
-  {
-    eyebrow: "PUERTAS INTERIORES",
-    title: "Casa Temozón",
-    detail: "Yucatán, 2023",
-  },
-  {
-    eyebrow: "COCINA INTEGRAL",
-    title: "Loft Centro",
-    detail: "Mérida, 2024",
-  },
+const projectsMeta = [
+  { folder: "mistiq-tulum", name: "Mistiq Tulum", year: "2023", location: "Tulum, Quintana Roo" },
+  { folder: "flora-y-fauna", name: "Flora y Fauna", year: "2022", location: "Tulum, Quintana Roo" },
+  { folder: "la-coordenada-perfecta", name: "La Coordenada Perfecta", year: "2021", location: "Tulum, Quintana Roo" },
+  { folder: "tanka-52", name: "Tanka 52", year: "2020", location: "Tulum, Quintana Roo" },
 ];
 
 const plans = [
@@ -124,28 +110,28 @@ const products = [
     name: "Cocinas",
     subtitle: "Esquemas L, U e islas con acabados premium",
     capacity: "30+ por mes",
-    placeholder: "FOTO COCINA",
+    image: "/fotos/2-productos/producto-cocinas.jpg",
   },
   {
     slug: "closets",
     name: "Clósets",
     subtitle: "Sistemas modulares con herrajes de cierre suave",
     capacity: "80+ por mes",
-    placeholder: "FOTO CLÓSET",
+    image: "/fotos/2-productos/producto-closets.jpg",
   },
   {
     slug: "banos",
     name: "Baños",
     subtitle: "Vanidades a medida resistentes a la humedad",
     capacity: "Personalizados",
-    placeholder: "FOTO BAÑO",
+    image: "/fotos/2-productos/producto-banos.webp",
   },
   {
     slug: "puertas",
     name: "Puertas",
     subtitle: "Interiores y exteriores con chapas naturales",
     capacity: "1000+ por mes",
-    placeholder: "FOTO PUERTA",
+    image: "/fotos/2-productos/producto-puertas.jpg",
   },
 ];
 
@@ -164,11 +150,15 @@ const statBorder = [
 ];
 
 export default function Home() {
+  const projects = projectsMeta.map((p) => ({
+    ...p,
+    photos: getProjectPhotos(p.folder),
+  }));
+
   return (
     <main>
       {/* ── Hero ───────────────────────────────────────────── */}
       <section className="min-h-screen flex flex-col md:flex-row">
-        {/* Left: copy */}
         <div className="flex flex-col justify-center px-8 sm:px-12 md:px-16 lg:px-24 py-20 md:py-0 md:w-1/2">
           <FadeIn delay={0}>
             <p className="text-xs text-gray-400 uppercase tracking-[0.2em] mb-6">
@@ -205,14 +195,18 @@ export default function Home() {
           </FadeIn>
         </div>
 
-        {/* Right: image placeholder */}
         <FadeIn
           delay={0.3}
-          className="md:w-1/2 bg-gray-100 min-h-72 md:min-h-full flex items-center justify-center"
+          className="md:w-1/2 relative min-h-72 md:min-h-full"
         >
-          <span className="text-gray-400 text-xs uppercase tracking-[0.2em] font-medium">
-            FOTO COCINA PREMIUM
-          </span>
+          <Image
+            src="/fotos/1-hero/hero-01.jpg"
+            alt="Cocina premium fabricada por Idera Muebles"
+            fill
+            priority
+            sizes="(max-width: 768px) 100vw, 50vw"
+            className="object-cover"
+          />
         </FadeIn>
       </section>
 
@@ -248,10 +242,14 @@ export default function Home() {
                 href={`/${product.slug}`}
                 className="group bg-gray-50 flex flex-col h-full hover:-translate-y-1 hover:shadow-lg transition-all duration-200"
               >
-                <div className="aspect-[4/3] bg-gray-200 flex items-center justify-center">
-                  <span className="text-gray-400 text-xs uppercase tracking-[0.2em] font-medium">
-                    {product.placeholder}
-                  </span>
+                <div className="relative aspect-[4/3] overflow-hidden">
+                  <Image
+                    src={product.image}
+                    alt={`${product.name} — Idera Muebles`}
+                    fill
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                    className="object-cover group-hover:scale-[1.03] transition-transform duration-300"
+                  />
                 </div>
                 <div className="p-6 flex flex-col flex-1">
                   <h3 className="text-xl font-semibold text-black">
@@ -424,39 +422,18 @@ export default function Home() {
           </p>
         </FadeIn>
 
-        <StaggerContainer className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-          {projects.map((project, i) => (
-            <StaggerItem key={i}>
-              <a href="#" className="group block">
-                <div className="overflow-hidden aspect-[4/5]">
-                  <div className="w-full h-full bg-gray-200 flex items-center justify-center group-hover:scale-[1.02] transition-transform duration-300">
-                    <span className="text-gray-400 text-xs uppercase tracking-[0.2em] font-medium">
-                      PROYECTO {String(i + 1).padStart(2, "0")}
-                    </span>
-                  </div>
-                </div>
-                <div className="pt-4">
-                  <p className="text-xs text-gray-400 uppercase tracking-[0.15em] mb-1">
-                    {project.eyebrow}
-                  </p>
-                  <h3 className="text-base font-semibold text-black">
-                    {project.title}
-                  </h3>
-                  <p className="text-sm text-gray-400 mt-0.5">{project.detail}</p>
-                </div>
-              </a>
+        <StaggerContainer className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+          {projects.map((project) => (
+            <StaggerItem key={project.folder}>
+              <ProjectCarousel
+                photos={project.photos}
+                name={project.name}
+                year={project.year}
+                location={project.location}
+              />
             </StaggerItem>
           ))}
         </StaggerContainer>
-
-        <FadeIn className="flex justify-center mt-16">
-          <a
-            href="/proyectos"
-            className="inline-flex items-center justify-center border border-black text-black px-8 py-4 text-sm font-medium tracking-wide hover:bg-gray-50 transition-colors"
-          >
-            Ver todos los proyectos
-          </a>
-        </FadeIn>
       </section>
 
       {/* ── Cierre con WhatsApp ────────────────────────────── */}
