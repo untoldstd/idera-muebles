@@ -10,8 +10,38 @@ const geistSans = Geist({
 });
 
 export const metadata: Metadata = {
-  title: "Idera Muebles",
-  description: "Muebles de calidad para tu hogar y oficina.",
+  metadataBase: new URL("https://ideramuebles.com"),
+
+  title: "Idera Muebles | Cocinas, Clósets y Muebles a Medida en Mérida",
+  description:
+    "Diseño, fabricación CNC e instalación de cocinas integrales, clósets, baños y puertas a medida. 5 años de garantía. Fábrica en Mérida, Yucatán. +500 proyectos completados.",
+  keywords: [
+    "cocinas integrales mérida",
+    "clósets a medida",
+    "muebles cnc",
+    "carpintería mérida yucatán",
+  ],
+  authors: [{ name: "Idera Muebles" }],
+  robots: { index: true, follow: true },
+
+  openGraph: {
+    type: "website",
+    url: "https://ideramuebles.com",
+    siteName: "Idera Muebles",
+    locale: "es_MX",
+    title: "Idera Muebles | Cocinas, Clósets y Muebles a Medida en Mérida",
+    description:
+      "Diseño, fabricación CNC e instalación de cocinas integrales, clósets, baños y puertas a medida. 5 años de garantía. Fábrica en Mérida, Yucatán. +500 proyectos completados.",
+    images: [{ url: "/fotos/1-hero/hero-01.jpg" }],
+  },
+
+  twitter: {
+    card: "summary_large_image",
+    title: "Idera Muebles | Cocinas, Clósets y Muebles a Medida en Mérida",
+    description:
+      "Diseño, fabricación CNC e instalación de cocinas integrales, clósets, baños y puertas a medida. 5 años de garantía. Fábrica en Mérida, Yucatán. +500 proyectos completados.",
+    images: ["/fotos/1-hero/hero-01.jpg"],
+  },
 };
 
 export default function RootLayout({
@@ -20,7 +50,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="es" className={`${geistSans.variable} h-full antialiased`}>
+    <html lang="es-MX" className={`${geistSans.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col">
         <Header />
         {children}
